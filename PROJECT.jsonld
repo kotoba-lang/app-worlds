@@ -1,0 +1,49 @@
+{
+  "@context": "https://schema.org/",
+  "@type": "Project",
+  "name": "Worlds (3D Scene Coding + VR)",
+  "identifier": "etzhayyim-project-worlds",
+  "status": "Proposed",
+  "description": "CodePen-like web IDE for creating and sharing A-Frame (WebXR) 3D scenes with glTF assets, VR preview, forking, and LLM-assisted coding.",
+  "url": "https://worlds.etzhayyim.com",
+  "hasPart": [
+    {
+      "@type": "WebApplication",
+      "name": "Worlds Editor",
+      "url": "https://worlds.etzhayyim.com"
+    },
+    {
+      "@type": "WebApplication",
+      "name": "Worlds Preview Origin",
+      "url": "https://cdn-worlds.etzhayyim.com"
+    }
+  ],
+  "component": [
+    {
+      "@type": "SoftwareApplication",
+      "name": "worlds-ui",
+      "description": "SvelteKit frontend: editor (HTML/CSS/JS), preview orchestration, asset browser, publishing, and LLM-assisted edits.",
+      "applicationCategory": "Frontend",
+      "programmingLanguage": "TypeScript",
+      "runtimePlatform": "nginx (Static) + API"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "worlds-api",
+      "description": "Backend for world metadata, versions, fork graph, and signed asset URLs. Integrates with auth (Clerk) and object storage/CDN.",
+      "applicationCategory": "Backend",
+      "programmingLanguage": "Go or TypeScript",
+      "runtimePlatform": "App service + Postgres + Object Storage"
+    }
+  ],
+  "keywords": [
+    "aframe",
+    "webxr",
+    "vr",
+    "gltf",
+    "glb",
+    "codepen-like",
+    "fork",
+    "llm"
+  ]
+}

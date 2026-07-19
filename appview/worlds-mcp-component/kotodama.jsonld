@@ -1,0 +1,34 @@
+{
+  "@context": "https://etzhayyim.com/ns/kotodama/v1",
+  "@id": "did:web:worlds.etzhayyim.com",
+  "name": "worlds",
+  "nanoid": "cvs4f8cg",
+  "project": "worlds",
+  "runtimeType": "worker",
+  "performerType": "service",
+  "uiType": "yoro",
+  "accent": "#06b6d4",
+  "convoSystemPrompt": "You are the worlds scene and asset management agent. You manage virtual world scenes, 3D assets, portals, and scene publishing.",
+  "profile": {
+    "displayName": "Worlds",
+    "description": "worlds — Worlds Scene & Asset Management Platform. Virtual world scene creation, 3D asset management, portal linking, and scene publishing.",
+    "avatar": "🌍",
+    "isBot": true,
+    "agentType": "autonomous",
+    "operator": "amanomibashira",
+    "capabilities": ["createScene", "listScenes", "getScene", "publishScene", "createAsset", "listAssets", "createPortal", "listPortals"],
+    "protocols": ["xrpc", "mcp"]
+  },
+  "governance": {
+    "raci": "responsible",
+    "classification": "public"
+  },
+  "triggers": {
+    "subscribeRepos": {
+      "collections": [
+        "com.etzhayyim.apps.worlds.scene",
+        "com.etzhayyim.apps.worlds.asset"
+      ]
+    }
+  }
+}

@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL"
+                  xmlns:zeebe="http://camunda.org/schema/zeebe/1.0"
+                  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+                  targetNamespace="http://bpmn.io/schema/bpmn">
+
+  <!-- createScene -->
+  <bpmn:process id="worlds-create-scene" name="Worlds Create Scene" isExecutable="true">
+    <bpmn:startEvent id="start-create-scene"/>
+    <bpmn:sequenceFlow id="sf-cs-1" sourceRef="start-create-scene" targetRef="task-create-scene"/>
+    <bpmn:serviceTask id="task-create-scene" name="Create Scene">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="com.etzhayyim.apps.worlds.create.scene"/>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="sf-cs-2" sourceRef="task-create-scene" targetRef="end-create-scene"/>
+    <bpmn:endEvent id="end-create-scene"/>
+  </bpmn:process>
+
+  <!-- listScenes -->
+  <bpmn:process id="worlds-list-scenes" name="Worlds List Scenes" isExecutable="true">
+    <bpmn:startEvent id="start-list-scenes"/>
+    <bpmn:sequenceFlow id="sf-ls-1" sourceRef="start-list-scenes" targetRef="task-list-scenes"/>
+    <bpmn:serviceTask id="task-list-scenes" name="List Scenes">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="com.etzhayyim.apps.worlds.list.scenes"/>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="sf-ls-2" sourceRef="task-list-scenes" targetRef="end-list-scenes"/>
+    <bpmn:endEvent id="end-list-scenes"/>
+  </bpmn:process>
+
+  <!-- getScene -->
+  <bpmn:process id="worlds-get-scene" name="Worlds Get Scene" isExecutable="true">
+    <bpmn:startEvent id="start-get-scene"/>
+    <bpmn:sequenceFlow id="sf-gs-1" sourceRef="start-get-scene" targetRef="task-get-scene"/>
+    <bpmn:serviceTask id="task-get-scene" name="Get Scene">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="com.etzhayyim.apps.worlds.get.scene"/>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="sf-gs-2" sourceRef="task-get-scene" targetRef="end-get-scene"/>
+    <bpmn:endEvent id="end-get-scene"/>
+  </bpmn:process>
+
+  <!-- publishScene -->
+  <bpmn:process id="worlds-publish-scene" name="Worlds Publish Scene" isExecutable="true">
+    <bpmn:startEvent id="start-publish-scene"/>
+    <bpmn:sequenceFlow id="sf-ps-1" sourceRef="start-publish-scene" targetRef="task-publish-scene"/>
+    <bpmn:serviceTask id="task-publish-scene" name="Publish Scene">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="com.etzhayyim.apps.worlds.publish.scene"/>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="sf-ps-2" sourceRef="task-publish-scene" targetRef="end-publish-scene"/>
+    <bpmn:endEvent id="end-publish-scene"/>
+  </bpmn:process>
+
+  <!-- createAsset -->
+  <bpmn:process id="worlds-create-asset" name="Worlds Create Asset" isExecutable="true">
+    <bpmn:startEvent id="start-create-asset"/>
+    <bpmn:sequenceFlow id="sf-ca-1" sourceRef="start-create-asset" targetRef="task-create-asset"/>
+    <bpmn:serviceTask id="task-create-asset" name="Create Asset">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="com.etzhayyim.apps.worlds.create.asset"/>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="sf-ca-2" sourceRef="task-create-asset" targetRef="end-create-asset"/>
+    <bpmn:endEvent id="end-create-asset"/>
+  </bpmn:process>
+
+  <!-- listAssets -->
+  <bpmn:process id="worlds-list-assets" name="Worlds List Assets" isExecutable="true">
+    <bpmn:startEvent id="start-list-assets"/>
+    <bpmn:sequenceFlow id="sf-la-1" sourceRef="start-list-assets" targetRef="task-list-assets"/>
+    <bpmn:serviceTask id="task-list-assets" name="List Assets">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="com.etzhayyim.apps.worlds.list.assets"/>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="sf-la-2" sourceRef="task-list-assets" targetRef="end-list-assets"/>
+    <bpmn:endEvent id="end-list-assets"/>
+  </bpmn:process>
+
+  <!-- createPortal -->
+  <bpmn:process id="worlds-create-portal" name="Worlds Create Portal" isExecutable="true">
+    <bpmn:startEvent id="start-create-portal"/>
+    <bpmn:sequenceFlow id="sf-cpor-1" sourceRef="start-create-portal" targetRef="task-create-portal"/>
+    <bpmn:serviceTask id="task-create-portal" name="Create Portal">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="com.etzhayyim.apps.worlds.create.portal"/>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="sf-cpor-2" sourceRef="task-create-portal" targetRef="end-create-portal"/>
+    <bpmn:endEvent id="end-create-portal"/>
+  </bpmn:process>
+
+  <!-- listPortals -->
+  <bpmn:process id="worlds-list-portals" name="Worlds List Portals" isExecutable="true">
+    <bpmn:startEvent id="start-list-portals"/>
+    <bpmn:sequenceFlow id="sf-lpor-1" sourceRef="start-list-portals" targetRef="task-list-portals"/>
+    <bpmn:serviceTask id="task-list-portals" name="List Portals">
+      <bpmn:extensionElements>
+        <zeebe:taskDefinition type="com.etzhayyim.apps.worlds.list.portals"/>
+      </bpmn:extensionElements>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="sf-lpor-2" sourceRef="task-list-portals" targetRef="end-list-portals"/>
+    <bpmn:endEvent id="end-list-portals"/>
+  </bpmn:process>
+
+</bpmn:definitions>
