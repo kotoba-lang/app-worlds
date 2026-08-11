@@ -1,1 +1,6 @@
-{:schema "etzhayyim.repository/v1" :name "com-etzhayyim-app-worlds" :kind :app :canonical-metadata :edn}
+{:schema "etzhayyim.repository/v1"
+ :name "app-worlds"
+ :kind :app
+ :canonical-metadata :edn
+ :boundary {:role :webxr-scene-authoring-application
+            :engine "kotoba-lang/kami-engine"}}
