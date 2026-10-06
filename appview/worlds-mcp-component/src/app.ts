@@ -4,9 +4,11 @@
 //            createAsset / listAssets / createPortal / listPortals
 
 interface SecretBinding { get(): Promise<string>; }
+interface Fetcher { fetch(req: Request): Promise<Response>; }
 interface Env {
   DISPATCHER_URL?: string;
   DISPATCHER_INTERNAL_SECRET?: string | SecretBinding;
+  ASSETS?: Fetcher;
   APP_NANOID?: string;
 }
 interface ExportedHandler<E> { fetch(req: Request, env: E): Promise<Response>; }
@@ -37,6 +39,8 @@ export default {
       if (body.__invalidJson) return json({ error: "InvalidJson" }, 400);
       return proxyToDispatcher(env, nsid, body);
     }
+
+    if (env.ASSETS) return env.ASSETS.fetch(req);
 
     return json({ error: "NotFound" }, 404);
   },
