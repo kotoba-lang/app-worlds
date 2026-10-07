@@ -3,15 +3,15 @@
 // 8 methods: createScene / listScenes / getScene / publishScene /
 //            createAsset / listAssets / createPortal / listPortals
 
-interface SecretBinding { get(): Promise<string>; }
+interface Fetcher { fetch(req: Request): Promise<Response>; }
 interface Env {
-  DISPATCHER_URL?: string;
-  DISPATCHER_INTERNAL_SECRET?: string | SecretBinding;
+  AGENTGATEWAY_MCP_ROUTER_URL?: string;
+  MCP_ROUTER_URL?: string;
+  ASSETS?: Fetcher;
   APP_NANOID?: string;
 }
 interface ExportedHandler<E> { fetch(req: Request, env: E): Promise<Response>; }
 
-const NSID_PREFIX = "com.etzhayyim.apps.worlds.";
 const ACTOR_DID = "did:web:worlds.etzhayyim.com";
 
 export default {
@@ -31,42 +31,60 @@ export default {
       });
     }
 
-    const nsid = url.pathname.startsWith("/xrpc/") ? url.pathname.slice("/xrpc/".length) : "";
-    if (nsid.startsWith(NSID_PREFIX) && (req.method === "POST" || req.method === "GET")) {
-      const body = await bodyWithQuery(req, url);
-      if (body.__invalidJson) return json({ error: "InvalidJson" }, 400);
-      return proxyToDispatcher(env, nsid, body);
+    if (url.pathname.startsWith("/xrpc/")) {
+      if (req.method === "OPTIONS") return new Response(null, { status: 204, headers: {
+        "access-control-allow-origin": "*", "access-control-allow-methods": "POST,OPTIONS",
+        "access-control-allow-headers": "content-type,authorization", "access-control-max-age": "86400",
+      } });
+      if (req.method !== "POST") return noStore({ error: "MethodNotAllowed" }, 405);
+      const nsid = url.pathname.slice("/xrpc/".length);
+      if (!nsid) return noStore({ error: "Missing XRPC method" }, 400);
+      const input: unknown = await req.json().catch(() => ({}));
+      return proxyToMcp(req, env, nsid, input);
     }
+
+    if (env.ASSETS) return env.ASSETS.fetch(req);
 
     return json({ error: "NotFound" }, 404);
   },
 } satisfies ExportedHandler<Env>;
 
-async function bodyWithQuery(req: Request, url: URL): Promise<Record<string, unknown>> {
-  let body: Record<string, unknown> = {};
-  if (req.method === "POST") {
-    const text = await req.text();
-    try { body = text ? (JSON.parse(text) as Record<string, unknown>) : {}; }
-    catch { return { __invalidJson: true }; }
-  }
-  for (const [k, v] of url.searchParams.entries()) {
-    if (!(k in body)) body[k] = v;
-  }
-  return body;
+function mcpRouterUrl(env: Env): string {
+  const configured = env.AGENTGATEWAY_MCP_ROUTER_URL?.trim()
+    ? env.AGENTGATEWAY_MCP_ROUTER_URL : env.MCP_ROUTER_URL?.trim()
+      ? env.MCP_ROUTER_URL : "https://mcp.etzhayyim.com/xrpc/com.etzhayyim.mcp.message";
+  return configured.replace(/\/+$/, "");
 }
 
-async function proxyToDispatcher(env: Env, nsid: string, body: Record<string, unknown>): Promise<Response> {
-  const dispatcherUrl = env.DISPATCHER_URL ?? "https://dispatcher.etzhayyim.com";
-  const secret = typeof env.DISPATCHER_INTERNAL_SECRET === "object"
-    ? await env.DISPATCHER_INTERNAL_SECRET.get()
-    : (env.DISPATCHER_INTERNAL_SECRET ?? "");
-  const res = await fetch(`${dispatcherUrl}/xrpc/${nsid}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", "x-internal-secret": secret },
-    body: JSON.stringify(body),
+async function proxyToMcp(req: Request, env: Env, nsid: string, input: unknown): Promise<Response> {
+  const headers = new Headers(req.headers);
+  headers.delete("host");
+  headers.set("content-type", "application/json");
+  headers.set("x-etzhayyim-bff", "sveltekit-edge-bff"); // Preserve the deployed router contract.
+  headers.set("x-etzhayyim-xrpc-method", nsid);
+  const res = await fetch(mcpRouterUrl(env), {
+    method: "POST", headers,
+    body: JSON.stringify({ jsonrpc: "2.0", id: crypto.randomUUID(), method: "tools/call",
+      params: { name: nsid, arguments: input } }),
   });
-  const data = await res.text();
-  return new Response(data, { status: res.status, headers: { "Content-Type": "application/json" } });
+  const text = await res.text();
+  let payload: unknown = text;
+  try { payload = text ? JSON.parse(text) : null; } catch { /* Preserve text payload. */ }
+  if (!res.ok) return noStore({ error: "MCP router request failed", upstream: payload }, res.status);
+  if (payload && typeof payload === "object" && "error" in payload) {
+    const error = payload.error as { message?: string } | null;
+    return noStore({ error: error?.message ?? "MCP router returned an error", upstream: payload }, 502);
+  }
+  const result = payload && typeof payload === "object" && "result" in payload ? payload.result : payload;
+  const structured = result && typeof result === "object" && "structuredContent" in result
+    ? result.structuredContent : result;
+  return noStore(structured ?? {});
+}
+
+function noStore(data: unknown, status = 200): Response {
+  const res = json(data, status);
+  res.headers.set("cache-control", "no-store");
+  return res;
 }
 
 function json(data: unknown, status = 200): Response {

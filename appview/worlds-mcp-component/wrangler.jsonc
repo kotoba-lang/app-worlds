@@ -1,6 +1,6 @@
 {
   "name": "kotodama-cvs4f8cg",
-  "main": "svelte/.svelte-kit/cloudflare/_worker.js",
+  "main": "src/app.ts",
   "compatibility_date": "2025-03-17",
   "compatibility_flags": [
     "nodejs_compat",
@@ -10,7 +10,7 @@
     "APP_CAPABILITIES": "[\"createScene\",\"listScenes\",\"getScene\",\"publishScene\",\"createAsset\",\"listAssets\",\"createPortal\",\"listPortals\"]",
     "APP_DESCRIPTION": "worlds — Worlds Scene & Asset Management Platform. Virtual world scene creation, 3D asset management, portal linking, and scene publishing.",
     "APP_DISPLAY_NAME": "Worlds",
-    "APP_FRAMEWORK": "sveltekit-edge-bff",
+    "APP_FRAMEWORK": "cljs-reagent-kotoba-ui",
     "APP_NANOID": "cvs4f8cg",
     "APP_PERFORMER_TYPE": "service",
     "APP_UI_TYPE": "yoro",
@@ -35,7 +35,7 @@
     }
   ],
   "assets": {
-    "directory": "./svelte/.svelte-kit/cloudflare/client",
+    "directory": "./cljs/public",
     "binding": "ASSETS",
     "html_handling": "auto-trailing-slash",
     "not_found_handling": "none"
