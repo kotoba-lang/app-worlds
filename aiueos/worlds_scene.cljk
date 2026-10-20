@@ -1,0 +1,72 @@
+(ns worlds.scene
+  "worlds（3D 世界）判定コア — itonami dapp bundle（pure, :effects #{}）。
+
+  シーン・アセット・ポータルの判定（正本: kotoba/src/registry.ts +
+  types.ts）:
+
+  - **SceneStatus は 3 つの閉じた集合**: draft / published / archived。
+    新規シーンは **draft から**始まる。
+  - **AssetType は 6 つの閉じた集合**: model / texture / audio / material /
+    script / other。
+  - status 更新は sceneId と status の検証 + シーンの存在（sceneNotFound）。
+  - アセットは assetId / sceneId / name 必須 + AssetType の検証。
+
+  scene-status-ok: 1 = 0..2（draft/published/archived）の内
+  asset-type-ok: 1 = 0..5（model/texture/audio/material/script/other）の内
+  status-update-judgment の戻り: 0 = 更新可 / 1 = invalidStatus
+    / 2 = sceneNotFound
+  asset-admission の戻り: 0 = 記録可 / 1 = missingRequiredFields
+    / 2 = invalidAssetType
+
+  実行 host はスカラーのみ = KIR v3 / i64/direct ABI（kernel/selfhost 両対応）。
+
+  テストはゼロ引数 test-*、戻り 1/0:
+  <amu> test aiueos/worlds_scene.cljk"
+  (:export [main scene-status-ok asset-type-ok status-update-judgment
+            asset-admission test-status test-asset test-update test-asset-admission
+            test-fail-closed]))
+
+(defn main [] :i64
+  0)
+
+(defn scene-status-ok [code :i64] :i64
+  (if (and (>= code 0) (<= code 2)) 1 0))
+
+(defn asset-type-ok [code :i64] :i64
+  (if (and (>= code 0) (<= code 5)) 1 0))
+
+(defn status-update-judgment [has-id :i64 status-code :i64 has-scene :i64] :i64
+  (if (= has-id 0)
+    1
+    (if (= (scene-status-ok status-code) 0)
+      1
+      (if (= has-scene 1) 0 2))))
+
+(defn asset-admission [has-required :i64 type-code :i64] :i64
+  (if (= has-required 0)
+    1
+    (if (= (asset-type-ok type-code) 1) 0 2)))
+
+;; --- tests（戻り 1 = pass） ------------------------------------------------
+
+(defn test-status [] :i64
+  ;; draft / published / archived の 3 つ
+  (if (= (+ (scene-status-ok 0) (scene-status-ok 2) (scene-status-ok 3)) 2) 1 0))
+
+(defn test-asset [] :i64
+  ;; model .. other の 6 つ
+  (if (= (+ (asset-type-ok 0) (asset-type-ok 5) (asset-type-ok 6)) 2) 1 0))
+
+(defn test-update [] :i64
+  ;; invalidStatus と sceneNotFound は排他（拒否順: id/status → 存在）
+  (if (= (+ (status-update-judgment 1 1 1) (status-update-judgment 1 9 1)
+            (status-update-judgment 1 1 0) (status-update-judgment 0 1 1))
+         4)
+    1 0))
+
+(defn test-asset-admission [] :i64
+  (if (= (+ (asset-admission 1 2) (asset-admission 0 2) (asset-admission 1 9)) 3) 1 0))
+
+(defn test-fail-closed [] :i64
+  ;; 集合外の status / type は拒否
+  (if (= (+ (status-update-judgment 1 3 1) (asset-admission 1 7)) 3) 1 0))
