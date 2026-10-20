@@ -1,0 +1,18 @@
+;; app-worlds — itonami（dapp）の aiueos アプリ記述子（notes.edn 形）。
+;; 判定コアは aiueos/worlds_scene.cljk（シーン status・アセット type 判定）。
+;; 正本は kotoba/src/registry.ts + types.ts。pure（:effects #{}）。
+{:aiueos/component :app/worlds-scene
+ :aiueos/kind :app
+ :aiueos/trust :untrusted
+ :aiueos/source "worlds_scene.cljk"
+ :aiueos/wasm "worlds_scene.wasm"
+ :aiueos/entry "main"
+ :aiueos/args []
+ :aiueos/imports #{}
+ :aiueos/exports #{:app/main
+                   :app/scene-status-ok
+                   :app/asset-type-ok
+                   :app/status-update-judgment
+                   :app/asset-admission}
+ :aiueos/effects #{}
+ :aiueos/limits {:memory-pages 16 :fuel 5000000}}
